@@ -1,49 +1,58 @@
 package com.example;
 
-import javafx.application.Application;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.util.Duration;
+import java.util.Random;
+
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.scene.Scene;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.VBox;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.stage.Stage;
 
+public class Main extends javafx.application.Application{
 
-public class Main extends Application {
+    private Random random = new Random();
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage stage) throws Exception {
         
-        TableView<Student> table = new TableView<>();
+        NumberAxis xAxis = new NumberAxis();
+        xAxis.setLabel("Time (s)");
 
-        TableColumn<Student, String> nameCol = new TableColumn<>("Name");
-        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-        nameCol.setMinWidth(200);
+        NumberAxis yAxis = new NumberAxis();
+        yAxis.setLabel("Value");
 
-        TableColumn<Student, Integer> ageCol = new TableColumn<>("Age");
-        ageCol.setCellValueFactory(new PropertyValueFactory<>("age"));
-        ageCol.setMinWidth(100);
+        LineChart<Number, Number> lineChart = new LineChart<>(xAxis, yAxis);
+        lineChart.setTitle("Random Linechart");
 
-        table.getColumns().addAll(nameCol, ageCol);
+        XYChart.Series<Number, Number> series = new XYChart.Series<>();
+        series.setName("Random data");
 
-        ObservableList<Student> data = FXCollections.observableArrayList(
-            new Student("Linh", 20),
-            new Student("An", 21),
-            new Student("Binh", 19)
+        lineChart.getData().add(series);
 
+        Timeline timeline = new Timeline(
+            new KeyFrame(Duration.seconds(1), e -> {
+
+                int y = random.nextInt(101);
+
+                for (XYChart.Data<Number, Number> d : series.getData()) {
+                    d.setXValue(d.getXValue().intValue() -1);
+                }
+
+                series.getData().add(new XYChart.Data<>(30, y));
+
+                series.getData().removeIf(d -> d.getXValue().intValue() < 0);
+            })
         );
-        
-        table.setItems(data);
 
-        VBox root = new VBox(table);
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
 
-        Scene scene = new Scene(root, 400, 300);
-
-        primaryStage.setTitle("Bai 6");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        Scene scene = new Scene(lineChart, 600, 400);
+        stage.setScene(scene);
+        stage.show();
 
     }
 
