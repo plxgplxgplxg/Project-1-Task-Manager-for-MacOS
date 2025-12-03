@@ -1,0 +1,46 @@
+/* Root background */
+.root-pane {
+    -fx-background-color: #f5f5f7; /* nhạt kiểu macOS */
+}
+
+/* TOP BAR */
+.top-bar {
+    -fx-background-color: linear-gradient(to bottom, #ffffff, #eaeaea);
+    -fx-border-color: #d0d0d0;
+    -fx-border-width: 0 0 1 0;
+}
+
+.title-label {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333;
+}
+
+/* TABPANE */
+.main-tabpane {
+    -fx-background-color: #fbfbfb;
+}
+
+.tab-pane .tab-header-area {
+    -fx-background-color: linear-gradient(to bottom, #fafafa, #eaeaea);
+}
+.tab-pane .tab-header-area .tab {
+    -fx-padding: 8 16 8 16;
+}
+.tab-pane .tab-header-area .tab:selected {
+    -fx-background-color: white;
+    -fx-border-color: #bcbcbc;
+    -fx-border-width: 1 1 0 1;
+}
+
+/* STATUS BAR */
+.status-bar {
+    -fx-background-color: #e5e5e5;
+    -fx-border-color: #c8c8c8;
+    -fx-border-width: 1 0 0 0;
+}
+
+.status-label {
+    -fx-text-fill: #555;
+    -fx-font-size: 13px;
+}

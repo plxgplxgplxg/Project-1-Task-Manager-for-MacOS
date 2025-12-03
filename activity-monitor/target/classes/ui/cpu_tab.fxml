@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.plxg.activitymonitor.controller.CpuController"
+      spacing="10"
+      prefWidth="900" prefHeight="600">
+
+    <children>
+
+        <TableView fx:id="cpuTable" prefHeight="500">
+
+            <columns>
+                <TableColumn fx:id="colProcessName" text="Process Name" prefWidth="200"/>
+                <TableColumn fx:id="colCPU" text="CPU" prefWidth="80"/>
+                <TableColumn fx:id="colCPUTime" text="CPU Time" prefWidth="120"/>
+                <TableColumn fx:id="colThreads" text="Threads" prefWidth="80"/>
+                <TableColumn fx:id="colIdleWakeUps" text="Idle Wake Ups" prefWidth="120"/>
+                <TableColumn fx:id="colPID" text="PID" prefWidth="80"/>
+                <TableColumn fx:id="colUser" text="User" prefWidth="120"/>
+            </columns>
+
+        </TableView>
+
+    </children>
+
+</VBox>
