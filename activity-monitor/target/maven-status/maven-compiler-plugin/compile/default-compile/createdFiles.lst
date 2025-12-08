@@ -1,9 +1,5 @@
-com/plxg/activitymonitor/controller/NetworkController.class
-com/plxg/activitymonitor/controller/MainController.class
-com/plxg/activitymonitor/controller/EnergyController.class
+com/plxg/activitymonitor/service/CpuService$CpuStats.class
+com/plxg/activitymonitor/service/CpuService.class
+com/plxg/activitymonitor/model/CpuProcessInfo.class
 com/plxg/activitymonitor/ActivityMonitorApp.class
-com/plxg/activitymonitor/controller/MemoryController.class
-com/plxg/activitymonitor/controller/DiskController.class
-com/plxg/activitymonitor/model/ProcessInfo.class
-com/plxg/activitymonitor/App.class
 com/plxg/activitymonitor/controller/CpuController.class
