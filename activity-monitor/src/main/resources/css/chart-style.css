@@ -1,19 +1,17 @@
-/* Series 0 (User) - Xanh */
 .default-color0.chart-series-area-fill {
-    -fx-fill: rgba(0, 191, 255, 0.3);  /* Xanh dương */
+    -fx-fill: rgba(0, 191, 255, 0.3);
 }
 
 .default-color0.chart-series-line {
-    -fx-stroke: #00BFFF;  /* Xanh dương */
+    -fx-stroke: #00BFFF;
     -fx-stroke-width: 2px;
 }
 
-/* Series 1 (System) - Đỏ */
 .default-color1.chart-series-area-fill {
-    -fx-fill: rgba(255, 107, 107, 0.3);  /* Đỏ */
+    -fx-fill: rgba(255, 107, 107, 0.3);
 }
 
 .default-color1.chart-series-line {
-    -fx-stroke: #FF6B6B;  /* Đỏ */
+    -fx-stroke: #FF6B6B;
     -fx-stroke-width: 2px;
 }

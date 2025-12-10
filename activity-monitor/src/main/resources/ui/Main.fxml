@@ -10,56 +10,57 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="mainRoot" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1150.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
-   <center>
-      <TabPane fx:id="mainTabPane" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
-        <tabs>
-          <Tab text="CPU">
-            <content>
-                <fx:include fx:id="cpuContent" source="CPU.fxml" />
-            </content>
-          </Tab>
-          <Tab text="Memory">
-            <content>
-                <fx:include fx:id="memoryContent" source="Memory.fxml" />
-            </content>
-          </Tab>
-            <Tab text="Energy">
-               <content>
-                   <fx:include fx:id="energyContent" source="Energy.fxml" />
-               </content>
-            </Tab>
-            <Tab text="Disk">
-               <content>
-                   <fx:include fx:id="diskContent" source="Disk.fxml" />
-               </content>
-            </Tab>
-            <Tab text="Network">
-               <content>
-                   <fx:include fx:id="networkContent" source="Network.fxml" />
-               </content>
-            </Tab>
-        </tabs>
-      </TabPane>
-   </center>
-   <top>
-      <HBox fx:id="headerBar" prefHeight="8.0" prefWidth="600.0" spacing="10.0" BorderPane.alignment="CENTER">
-         <padding>
-            <Insets bottom="3.0" left="10.0" right="10.0" top="4.0" />
-         </padding>
-         <children>
-            <Label fx:id="lblAppTitle" text="Activity Monitor">
-               <font>
-                  <Font name="System Bold Italic" size="14.0" />
-               </font>
-            </Label>
-            <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-            <TextField fx:id="txtSearch" promptText="Search">
-               <font>
-                  <Font size="10.0" />
-               </font>
-            </TextField>
-         </children>
-      </HBox>
-   </top>
+
+<BorderPane fx:id="mainRoot" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+    <center>
+        <TabPane fx:id="mainTabPane" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+            <tabs>
+                <Tab text="CPU">
+                    <content>
+                        <fx:include fx:id="cpuContent" source="CPU.fxml" />
+                    </content>
+                </Tab>
+                <Tab text="Memory">
+                    <content>
+                        <fx:include fx:id="memoryContent" source="Memory.fxml" />
+                    </content>
+                </Tab>
+                <Tab text="Energy">
+                    <content>
+                        <fx:include fx:id="energyContent" source="Energy.fxml" />
+                    </content>
+                </Tab>
+                <Tab text="Disk">
+                    <content>
+                        <fx:include fx:id="diskContent" source="Disk.fxml" />
+                    </content>
+                </Tab>
+                <Tab text="Network">
+                    <content>
+                        <fx:include fx:id="networkContent" source="Network.fxml" />
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </center>
+    <top>
+        <HBox fx:id="headerBar" spacing="10.0" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="3.0" left="10.0" right="10.0" top="4.0" />
+            </padding>
+            <children>
+                <Label fx:id="lblAppTitle" prefHeight="18.0" prefWidth="107.0" text="Activity Monitor">
+                    <font>
+                        <Font name="System Bold Italic" size="14.0" />
+                    </font>
+                </Label>
+                <Region prefHeight="20.0" prefWidth="718.0" HBox.hgrow="ALWAYS" />
+                <TextField fx:id="txtSearch" prefWidth="150.0" promptText="Search">
+                    <font>
+                        <Font size="10.0" />
+                    </font>
+                </TextField>
+            </children>
+        </HBox>
+    </top>
 </BorderPane>

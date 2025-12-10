@@ -2,24 +2,25 @@ package com.plxg.activitymonitor.controller;
 
 import com.plxg.activitymonitor.model.CpuProcessInfo;
 import com.plxg.activitymonitor.service.CpuService;
+import com.plxg.activitymonitor.service.ProcessService;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.chart.AreaChart;
-import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.StackedAreaChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.Label;
 import javafx.util.Duration;
+import oshi.software.os.OSProcess;
 
+import java.util.Objects;
 
-import java.awt.*;
 
 public class CpuController {
     @FXML
@@ -71,35 +72,15 @@ public class CpuController {
     private Label lblProcesses;
 
     @FXML
-    private AreaChart<Number, Number> cpuLoadChart;
+    private StackedAreaChart<Number, Number> cpuLoadChart;
 
-    @FXML
-    private NumberAxis xAxis;
 
     @FXML
     private NumberAxis yAxis;
 
-
-
-
-    private final ObservableList<CpuProcessInfo> processData =
-            FXCollections.observableArrayList();
-
-    //goi service cap nhat summary cpu o cuoi
-    private  final CpuService cpuService = new CpuService();
-
-    private  XYChart.Series<Number, Number> userSeries;
-    private XYChart.Series<Number, Number> systemSeries;
-    private int time = 0;
-
-
-
     @FXML
     private void initialize() {
         setupTableColumns();
-        loadDummyData();
-//        updateSummary(); mock data test ui
-//        drawDummyChart(); mock data test ui
 
         NumberAxis xAxis = (NumberAxis) cpuLoadChart.getXAxis();
         xAxis.setAutoRanging(false);
@@ -107,14 +88,70 @@ public class CpuController {
         xAxis.setUpperBound(30);
         xAxis.setTickUnit(5);
 
-        yAxis.setAutoRanging(true);
+        yAxis.setAutoRanging(false);
+        yAxis.setLowerBound(0);
+        yAxis.setUpperBound(100);
+        yAxis.setTickUnit(10);
 
         setupChartSeries();
 
-
+        loadChartStylesheet();
 
         startCpuRealtimeUpdate(xAxis);
     }
+
+
+
+
+    private final ObservableList<CpuProcessInfo> processData =
+            FXCollections.observableArrayList();
+
+    private final ProcessService processService = new ProcessService();
+
+
+    private CpuProcessInfo convert(OSProcess p) {
+        String name = p.getName();
+
+        double cpu = processService.getCpuLoad(p.getProcessID());
+        if (cpu < 1.0) {
+            cpu *=100;
+        }
+        cpu = Math.min(cpu, 100.0);
+
+        String cpuTime = formatCpuTime(p.getKernelTime() + p.getUserTime());
+        int threads = p.getThreadCount();
+
+        // oshi k lay dc vi k co api cong khai cua macos:
+        int idleWakeUps = (int) (Math.random() * 200); //fake
+        String kind = "Apple"; //fake
+        double gpuPercent = 0.0; // fake
+        String gpuTime = "0:00"; // fake
+
+        int pid = p.getProcessID();
+        String user = p.getUser();
+
+        return new CpuProcessInfo(name, cpu, cpuTime, threads, idleWakeUps, kind, gpuPercent, gpuTime, pid, user);
+    }
+
+    //update process list:
+    private void updateProcessTable() {
+        var list = processService.getAllProcesses();
+
+        processData.clear();
+        for (OSProcess process : list) {
+            processData.add(convert(process));
+        }
+        updateSummaryTableInfo();
+
+    }
+
+
+
+    private  final CpuService cpuService = new CpuService();
+
+    private  XYChart.Series<Number, Number> userSeries;
+    private XYChart.Series<Number, Number> systemSeries;
+    private int time = 0;
 
 
     private  void setupChartSeries() {
@@ -132,7 +169,7 @@ public class CpuController {
     //css cho chart cho dep:
     private  void loadChartStylesheet() {
         try {
-            String css = getClass().getResource("/css/chart-style.css").toExternalForm();
+            String css = Objects.requireNonNull(getClass().getResource("/css/chart-style.css")).toExternalForm();
             cpuLoadChart.getStylesheets().add(css);
         } catch (NullPointerException e) {
             System.err.println("CSS file not found: /css/chart-style.css");
@@ -140,10 +177,12 @@ public class CpuController {
         }
     }
 
-    //cap nhat bieu do moi 500ms:
     private void startCpuRealtimeUpdate(NumberAxis xAxis) {
         Timeline timeline = new Timeline(
-                new KeyFrame(Duration.millis(1000), event -> updateCpuData(xAxis) )
+                new KeyFrame(Duration.millis(2000), event -> {
+                    updateCpuData(xAxis);
+                    updateProcessTable();
+                } )
         );
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
@@ -154,6 +193,7 @@ public class CpuController {
 
         // summary panel
         lblUser.setText(String.format("%.1f%%", stats.user()));
+
         lblSystem.setText(String.format("%.1f%%", stats.system()));
         lblIdle.setText(String.format("%.1f%%", stats.idle()));
 
@@ -173,7 +213,6 @@ public class CpuController {
             xAxis.setLowerBound(time - 30);
             xAxis.setUpperBound(time);
         }
-        updateSummaryTableInfo();
     }
 
     private void updateSummaryTableInfo() {
@@ -226,64 +265,15 @@ public class CpuController {
         cpuTable.setItems(processData);
     }
 
-    //mockupdata:
-    private void loadDummyData() {
-        processData.clear();
-
-        processData.addAll(
-                new CpuProcessInfo("IntelliJ IDEA", 12.5, "01:23:45",
-                        80, 10, "Apple", 0.0, "00:12:34", 463, "plxg"),
-                new CpuProcessInfo("Google Chrome", 25.3, "10:01:59",
-                        120, 50, "Apple", 5.0, "01:05:12", 1486, "plxg"),
-                new CpuProcessInfo("kernel_task", 8.1, "02:10:33",
-                        500, 200, "Apple", 0.0, "00:00:00", 0, "root"),
-                new CpuProcessInfo("Activity Monitor", 3.2, "00:10:05",
-                        30, 5, "Apple", 0.0, "00:00:00", 2762, "plxg")
-        );
+    // milis sang hh:mm:ss
+    private String formatCpuTime(long millis) {
+        long sec = millis / 1000;
+        long h = sec / 3600;
+        long m = (sec % 3600) / 60;
+        long s = sec % 60;
+        return String.format("%d:%02d:%02d", h, m, s);
     }
 
-//    private void updateSummary() {
-//        //mockup data
-//        double system = 12.0;
-//        double user = 25.0;
-//        double idle = 65.0;
-//
-//        lblSystem.setText(String.format("%.1f%%", system));
-//        lblUser.setText(String.format("%.1f%%", user));
-//        lblIdle.setText(String.format("%.1f%%", idle));
-//
-//        int totalThreads = processData.stream()
-//                .mapToInt(CpuProcessInfo::getThreads)
-//                .sum();
-//
-//        int processes = processData.size();
-//
-//        lblThreads.setText(String.valueOf(totalThreads));
-//        lblProcesses.setText(String.valueOf(processes));
-//    }
 
-    //linechart: cpu load
-
-//    private void drawDummyChart() {
-//        //xoa data cu neu co
-//        cpuLoadChart.getData().clear();
-//
-//        XYChart.Series<Number, Number> userSeries = new XYChart.Series<>();
-//        userSeries.setName("User");
-//
-//        XYChart.Series<Number, Number> systemSeries = new XYChart.Series<>();
-//        systemSeries.setName("System");
-//
-//        //mock data:
-//        for (int t = 0; t <= 30; t++) {
-//            userSeries.getData().add(
-//                    new XYChart.Data<>(t, 20 + Math.sin(t / 5.0) * 5)
-//            );
-//            systemSeries.getData().add(
-//                    new XYChart.Data<>(t, 5 + Math.sin(t / 6.0) *2)
-//            );
-//        }
-//        cpuLoadChart.getData().addAll(userSeries, systemSeries);
-//    }
 
 }
