@@ -16,7 +16,7 @@
 <?import javafx.scene.text.Font?>
 
 
-<AnchorPane prefHeight="650.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" >
+<AnchorPane prefHeight="650.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.plxg.activitymonitor.controller.MemoryController">
    <children>
       <VBox prefHeight="200.0" spacing="8.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <padding>
@@ -41,9 +41,10 @@
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="25.0" prefWidth="100.0" />
               </columnConstraints>
               <rowConstraints>
-                <RowConstraints minHeight="10.0" percentHeight="33.33" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" percentHeight="33.33" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" percentHeight="33.33" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" percentHeight="25.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" percentHeight="25.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" percentHeight="25.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" percentHeight="25.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <padding>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -54,24 +55,24 @@
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Label>
-                  <AreaChart fx:id="memoryPressureChart" createSymbols="false" horizontalGridLinesVisible="false" legendVisible="false" verticalGridLinesVisible="false" GridPane.rowIndex="1" GridPane.rowSpan="2">
-                    <xAxis>
-                      <CategoryAxis side="BOTTOM" />
-                    </xAxis>
-                    <yAxis>
-                      <NumberAxis side="LEFT" />
-                    </yAxis>
-                     <GridPane.margin>
-                        <Insets />
-                     </GridPane.margin>
-                  </AreaChart>
-                  <Label fx:id="lblPhysicalMemoryLabel" text="Physical Memory:" GridPane.columnIndex="1" />
+                   <AreaChart fx:id="memoryPressureChart" createSymbols="false" horizontalGridLinesVisible="false" legendVisible="false" verticalGridLinesVisible="false" GridPane.rowIndex="1" GridPane.rowSpan="3">
+                       <xAxis>
+                           <NumberAxis minorTickVisible="false" side="BOTTOM" tickLabelsVisible="false" tickMarkVisible="false" />
+                       </xAxis>
+                       <yAxis>
+                           <NumberAxis fx:id="yAxis" autoRanging="false" upperBound="100" minorTickVisible="false" side="LEFT" tickLabelsVisible="false" tickMarkVisible="false" />
+                       </yAxis>
+                   </AreaChart>
+
+                   <Label fx:id="lblPhysicalMemoryLabel" text="Physical Memory:" GridPane.columnIndex="1" />
                   <Label fx:id="lblPhysicalMemory" text="16,00 GB" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
                   <Label fx:id="lblMemoryUsedLabel" text="Memory Used:" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   <Label fx:id="lblMemoryUsed" text="11,08 GB" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
                   <Label fx:id="lblCachedFilesLabel" text="Cached Files:" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                   <Label fx:id="lblCachedFiles" text="4,73 GB" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
-                  <Label fx:id="lblAppMemoryLabel" text="App Memory:" GridPane.columnIndex="2" />
+                   <Label fx:id="lblSwapUsedLabel" text="Swap Used:" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                   <Label fx:id="lblSwapUsed" text="0 MB" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
+                   <Label fx:id="lblAppMemoryLabel" text="App Memory:" GridPane.columnIndex="2" />
                   <Label fx:id="lblAppMemory" text="8,25 GB" GridPane.columnIndex="2" GridPane.halignment="CENTER" />
                   <Label fx:id="lblWiredMemoryLabel" text="Wired Memory:" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                   <Label fx:id="lblWiredMemory" text="1,60 GB" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" />

@@ -1,5 +1,9 @@
 /Users/plxg/workspace/Project-1-Task-Manager-for-MacOS/activity-monitor/src/main/java/com/plxg/activitymonitor/ActivityMonitorApp.java
 /Users/plxg/workspace/Project-1-Task-Manager-for-MacOS/activity-monitor/src/main/java/com/plxg/activitymonitor/controller/CpuController.java
+/Users/plxg/workspace/Project-1-Task-Manager-for-MacOS/activity-monitor/src/main/java/com/plxg/activitymonitor/controller/MemoryController.java
 /Users/plxg/workspace/Project-1-Task-Manager-for-MacOS/activity-monitor/src/main/java/com/plxg/activitymonitor/model/CpuProcessInfo.java
+/Users/plxg/workspace/Project-1-Task-Manager-for-MacOS/activity-monitor/src/main/java/com/plxg/activitymonitor/model/MemoryProcessInfo.java
 /Users/plxg/workspace/Project-1-Task-Manager-for-MacOS/activity-monitor/src/main/java/com/plxg/activitymonitor/service/CpuService.java
+/Users/plxg/workspace/Project-1-Task-Manager-for-MacOS/activity-monitor/src/main/java/com/plxg/activitymonitor/service/MemoryService.java
 /Users/plxg/workspace/Project-1-Task-Manager-for-MacOS/activity-monitor/src/main/java/com/plxg/activitymonitor/service/ProcessService.java
+/Users/plxg/workspace/Project-1-Task-Manager-for-MacOS/activity-monitor/src/main/java/com/plxg/activitymonitor/util/FormatUtils.java
