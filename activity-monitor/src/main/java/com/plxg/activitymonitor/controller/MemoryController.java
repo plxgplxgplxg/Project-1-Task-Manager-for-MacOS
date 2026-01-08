@@ -2,6 +2,7 @@ package com.plxg.activitymonitor.controller;
 
 import com.plxg.activitymonitor.model.MemoryProcessInfo;
 import com.plxg.activitymonitor.service.MemoryService;
+import com.plxg.activitymonitor.service.ProcessKillService;
 import com.plxg.activitymonitor.util.FormatUtils;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -13,17 +14,17 @@ import javafx.fxml.FXML;
 import javafx.scene.chart.AreaChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Label;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Duration;
 
 import java.util.Objects;
+import java.util.Optional;
 
 
 public class MemoryController {
+
+    private String filterText = "";
 
     @FXML
     private TableView<MemoryProcessInfo> memoryTable;
@@ -72,6 +73,7 @@ public class MemoryController {
 
     private final ObservableList<MemoryProcessInfo> processData = FXCollections.observableArrayList();
     private final MemoryService memoryService = new MemoryService();
+    private final ProcessKillService killService = new ProcessKillService();
     private XYChart.Series<Number, Number> memorySeries;
     private int time = 0;
 
@@ -83,11 +85,11 @@ public class MemoryController {
         startRealtimeUpdate();
     }
 
-    //setup column trong tableview:
+    //setup column 
     private void setUpTableColumns() {
         colProcessName.setCellValueFactory(new PropertyValueFactory<>("processName"));
 
-        //format memory sang don vi phu hop
+        //format memory 
         colMemory.setCellValueFactory(cellData -> {
             long bytes = cellData.getValue().getMemoryBytes();
             return new SimpleStringProperty(FormatUtils.formatBytes(bytes));
@@ -99,23 +101,78 @@ public class MemoryController {
         colUser.setCellValueFactory(new PropertyValueFactory<>("user"));
 
         memoryTable.setItems(processData);
+        setupContextMenu();
+    }
+
+    private void setupContextMenu() {
+        ContextMenu contextMenu = new ContextMenu();
+        MenuItem killItem = new MenuItem("Kết thúc tiến trình");
+        killItem.setOnAction(e -> killSelectedProcess());
+        contextMenu.getItems().add(killItem);
+        memoryTable.setContextMenu(contextMenu);
+    }
+
+    private void killSelectedProcess() {
+        MemoryProcessInfo selected = memoryTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            return;
+        }
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Xác nhận");
+        confirm.setHeaderText("Kết thúc tiến trình: " + selected.getProcessName());
+        confirm.setContentText("Bạn có chắc muốn kết thúc tiến trình này? (PID: " + selected.getPid() + ")");
+
+        Optional<ButtonType> result = confirm.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            ProcessKillService.KillResult killResult = killService.killProcess(selected.getPid());
+            showKillResult(killResult, selected.getProcessName());
+        }
+    }
+
+    private void showKillResult(ProcessKillService.KillResult result, String processName) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Kết quả");
+
+        switch (result) {
+            case SUCCESS -> {
+                alert.setHeaderText("Thành công");
+                alert.setContentText("Đã kết thúc tiến trình: " + processName);
+            }
+            case ACCESS_DENIED -> {
+                alert.setAlertType(Alert.AlertType.ERROR);
+                alert.setHeaderText("Không có quyền");
+                alert.setContentText("Không thể kết thúc tiến trình hệ thống. Cần quyền Administrator.");
+            }
+            case NOT_FOUND -> {
+                alert.setAlertType(Alert.AlertType.WARNING);
+                alert.setHeaderText("Không tìm thấy");
+                alert.setContentText("Tiến trình không còn tồn tại.");
+            }
+            case FAILED -> {
+                alert.setAlertType(Alert.AlertType.ERROR);
+                alert.setHeaderText("Thất bại");
+                alert.setContentText("Không thể kết thúc tiến trình.");
+            }
+        }
+        alert.showAndWait();
     }
 
     private void setUpChart() {
         memoryPressureChart.getData().clear();
+        
+        memoryPressureChart.getStyleClass().add("memory-pressure-chart");
 
-        // Setup trục X
         NumberAxis xAxis = (NumberAxis) memoryPressureChart.getXAxis();
         xAxis.setAutoRanging(false);
         xAxis.setLowerBound(0);
         xAxis.setUpperBound(30);
         xAxis.setTickUnit(5);
 
-        // Setup trục Y
         NumberAxis yAxis = (NumberAxis) memoryPressureChart.getYAxis();
         yAxis.setAutoRanging(false);
         yAxis.setLowerBound(0);
-        yAxis.setUpperBound(100);
+        yAxis.setUpperBound(50);
         yAxis.setTickUnit(10);
 
         memorySeries = new XYChart.Series<>();
@@ -156,7 +213,7 @@ public class MemoryController {
         //label:
         lblPhysicalMemory.setText(FormatUtils.formatBytes(stats.totalMemory()));
         lblMemoryUsed.setText(FormatUtils.formatBytes(stats.usedMemory()));
-        lblCachedFiles.setText(FormatUtils.formatBytes(stats.cachedMemory()));
+        lblCachedFiles.setText("N/A");
         lblSwapUsed.setText(FormatUtils.formatBytes(stats.swapUsed()));
 
         //MACOS ko cung cap api cho app/wired/compressed memory
@@ -164,9 +221,9 @@ public class MemoryController {
         lblWiredMemory.setText("N/A");
         lblCompressed.setText("N/A");
 
-        //update chart
-        double pressurePercent = (double) stats.usedMemory() / stats.totalMemory() * 100;
-        memorySeries.getData().add(new XYChart.Data<>(time, pressurePercent));
+        //update chart 
+        double pressure = memoryService.getMemoryPressure();
+        memorySeries.getData().add(new XYChart.Data<>(time, pressure));
         time++;
 
         if (memorySeries.getData().size() > 30) {
@@ -185,6 +242,14 @@ public class MemoryController {
     private void updateProcessTable() {
         var processes = memoryService.getProcessesByMemory();
         processData.clear();
-        processData.addAll(processes);
+        for (var p : processes) {
+            if (filterText.isEmpty() || p.getProcessName().toLowerCase().contains(filterText)) {
+                processData.add(p);
+            }
+        }
+    }
+
+    public void setFilter(String filter) {
+        this.filterText = filter;
     }
 }

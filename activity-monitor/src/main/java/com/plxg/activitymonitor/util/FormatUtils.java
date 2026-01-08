@@ -39,4 +39,12 @@ public class FormatUtils {
         long seconds = totalSeconds % 60;
         return String.format("%02d:%02d:%02d", hours, minutes, seconds);
     }
+    
+    // format so lon voi dau cham
+    public static String formatNumber(long number) {
+        if (number < 1000) {
+            return String.valueOf(number);
+        }
+        return String.format("%,d", number).replace(",", ".");
+    }
 }

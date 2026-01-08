@@ -36,17 +36,19 @@ public class NetworkService {
     }
 
     public NetworkStats getNetworkStats() {
-        List<OSProcess> processes = os.getProcesses();
+        var networks = si.getHardware().getNetworkIFs(true);
+        
         long totalRcvd = 0;
         long totalSent = 0;
         long totalPacketsRcvd = 0;
         long totalPacketsSent = 0;
 
-        for (OSProcess process : processes) {
-            totalRcvd += process.getBytesRead();
-            totalSent += process.getBytesWritten();
-            totalPacketsRcvd += Math.random() * 1000;
-            totalPacketsSent += Math.random() * 1000;
+        for (var net : networks) {
+            net.updateAttributes();
+            totalRcvd += net.getBytesRecv();
+            totalSent += net.getBytesSent();
+            totalPacketsRcvd += net.getPacketsRecv();
+            totalPacketsSent += net.getPacketsSent();
         }
 
         return new NetworkStats(totalRcvd, totalSent, totalPacketsRcvd, totalPacketsSent);
@@ -56,29 +58,18 @@ public class NetworkService {
         List<OSProcess> processes = os.getProcesses();
 
         List<NetworkProcessInfo> result = processes.stream()
-                .map(p -> new NetworkProcessInfo(
-                        p.getName(),
-                        p.getBytesWritten(),
-                        p.getBytesRead(),
-                        (long)(Math.random() * 500),
-                        (long)(Math.random() * 500),
-                        p.getProcessID(),
-                        p.getUser()
-                ))
-                .sorted(Comparator.comparingLong((NetworkProcessInfo p) -> 
-                        p.getSentBytes() + p.getRcvdBytes()).reversed())
+                .map(p -> {
+                    return new NetworkProcessInfo(
+                            p.getName(),
+                            0,
+                            0,
+                            0,
+                            0,
+                            p.getProcessID(),
+                            p.getUser()
+                    );
+                })
                 .toList();
-
-        previousNetworkIO.clear();
-        for (OSProcess process : processes) {
-            previousNetworkIO.put(process.getProcessID(), 
-                    new NetworkIOData(
-                            process.getBytesRead(), 
-                            process.getBytesWritten(), 
-                            0, 
-                            0
-                    ));
-        }
 
         return result;
     }

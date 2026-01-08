@@ -2,6 +2,7 @@ package com.plxg.activitymonitor.controller;
 
 import com.plxg.activitymonitor.model.CpuProcessInfo;
 import com.plxg.activitymonitor.service.CpuService;
+import com.plxg.activitymonitor.service.ProcessKillService;
 import com.plxg.activitymonitor.service.ProcessService;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -12,17 +13,19 @@ import javafx.fxml.FXML;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.StackedAreaChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.Label;
 import javafx.util.Duration;
 import oshi.software.os.OSProcess;
 
 import java.util.Objects;
+import java.util.Optional;
 
 
 public class CpuController {
+
+    private String filterText = "";
+
     @FXML
     private TableView<CpuProcessInfo> cpuTable;
 
@@ -107,6 +110,7 @@ public class CpuController {
             FXCollections.observableArrayList();
 
     private final ProcessService processService = new ProcessService();
+    private final ProcessKillService killService = new ProcessKillService();
 
 
     private CpuProcessInfo convert(OSProcess p) {
@@ -121,11 +125,10 @@ public class CpuController {
         String cpuTime = formatCpuTime(p.getKernelTime() + p.getUserTime());
         int threads = p.getThreadCount();
 
-        // oshi k lay dc vi k co api cong khai cua macos:
-        int idleWakeUps = (int) (Math.random() * 200); //fake
-        String kind = "Apple"; //fake
-        double gpuPercent = 0.0; // fake
-        String gpuTime = "0:00"; // fake
+        int idleWakeUps = 0;
+        String kind = "N/A";
+        double gpuPercent = 0.0;
+        String gpuTime = "N/A";
 
         int pid = p.getProcessID();
         String user = p.getUser();
@@ -139,7 +142,10 @@ public class CpuController {
 
         processData.clear();
         for (OSProcess process : list) {
-            processData.add(convert(process));
+            CpuProcessInfo info = convert(process);
+            if (filterText.isEmpty() || info.getProcessName().toLowerCase().contains(filterText)) {
+                processData.add(info);
+            }
         }
         updateSummaryTableInfo();
 
@@ -263,6 +269,61 @@ public class CpuController {
                 new PropertyValueFactory<>("user")
         );
         cpuTable.setItems(processData);
+        setupContextMenu();
+    }
+
+    private void setupContextMenu() {
+        ContextMenu contextMenu = new ContextMenu();
+        MenuItem killItem = new MenuItem("Kết thúc tiến trình");
+        killItem.setOnAction(e -> killSelectedProcess());
+        contextMenu.getItems().add(killItem);
+        cpuTable.setContextMenu(contextMenu);
+    }
+
+    private void killSelectedProcess() {
+        CpuProcessInfo selected = cpuTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            return;
+        }
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Xác nhận");
+        confirm.setHeaderText("Kết thúc tiến trình: " + selected.getProcessName());
+        confirm.setContentText("Bạn có chắc muốn kết thúc tiến trình này? (PID: " + selected.getPid() + ")");
+
+        Optional<ButtonType> result = confirm.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            ProcessKillService.KillResult killResult = killService.killProcess(selected.getPid());
+            showKillResult(killResult, selected.getProcessName());
+        }
+    }
+
+    private void showKillResult(ProcessKillService.KillResult result, String processName) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Kết quả");
+
+        switch (result) {
+            case SUCCESS -> {
+                alert.setHeaderText("Thành công");
+                alert.setContentText("Đã kết thúc tiến trình: " + processName);
+            }
+            case ACCESS_DENIED -> {
+                alert.setAlertType(Alert.AlertType.ERROR);
+                alert.setHeaderText("Không có quyền");
+                alert.setContentText("Không thể kết thúc tiến trình hệ thống. Cần quyền Administrator.");
+            }
+            case NOT_FOUND -> {
+                alert.setAlertType(Alert.AlertType.WARNING);
+                alert.setHeaderText("Không tìm thấy");
+                alert.setContentText("Tiến trình không còn tồn tại.");
+            }
+            case FAILED -> {
+                alert.setAlertType(Alert.AlertType.ERROR);
+                alert.setHeaderText("Thất bại");
+                alert.setContentText("Không thể kết thúc tiến trình.");
+            }
+        }
+        alert.showAndWait();
     }
 
     // milis sang hh:mm:ss
@@ -274,6 +335,7 @@ public class CpuController {
         return String.format("%d:%02d:%02d", h, m, s);
     }
 
-
-
+    public void setFilter(String filter) {
+        this.filterText = filter;
+    }
 }

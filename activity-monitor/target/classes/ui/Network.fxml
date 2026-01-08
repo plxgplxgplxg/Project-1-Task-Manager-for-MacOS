@@ -2,7 +2,6 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.chart.AreaChart?>
-<?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
@@ -15,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="650.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" >
+<AnchorPane prefHeight="650.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.plxg.activitymonitor.controller.NetworkController">
 
     <children>
         <VBox spacing="8" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
@@ -24,7 +23,7 @@
                 <Insets bottom="10" left="10" right="10" top="10" />
             </padding>
 
-            <!-- 7 COLUMN TABLE -->
+            <!-- 7 COLUMN TABLE - dung thu tu nhu Activity Monitor -->
             <TableView fx:id="networkTable" prefHeight="350" VBox.vgrow="ALWAYS">
                 <columns>
                     <TableColumn fx:id="colProcessName" prefWidth="300" text="Process Name" />
@@ -50,8 +49,10 @@
 
                 <rowConstraints>
                     <RowConstraints percentHeight="20.0" />
-                    <RowConstraints percentHeight="33.33" />
-                    <RowConstraints percentHeight="33.33" />
+                    <RowConstraints percentHeight="20.0" />
+                    <RowConstraints percentHeight="20.0" />
+                    <RowConstraints percentHeight="20.0" />
+                    <RowConstraints percentHeight="20.0" />
                 </rowConstraints>
 
                 <!-- LEFT INFO -->
@@ -62,20 +63,20 @@
                 <Label fx:id="lblPacketsOut" text="0" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
 
                 <Label text="Packets in/sec:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                <Label fx:id="lblPacketsInSec" text="0" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
+                <Label fx:id="lblPacketsInSec" text="0" style="-fx-text-fill: #5AC8FA;" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
 
-                <Label managed="false" text="Packets out/sec:" visible="false" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-                <Label fx:id="lblPacketsOutSec" managed="false" text="0" visible="false" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                <Label text="Packets out/sec:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                <Label fx:id="lblPacketsOutSec" text="0" style="-fx-text-fill: #FF6B6B;" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
 
                 <!-- CENTER CHART -->
                 <Label text="PACKETS" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="0">
                     <font><Font name="System Bold" size="14" /></font>
                 </Label>
 
-                <AreaChart fx:id="networkChart" createSymbols="false" horizontalGridLinesVisible="false" legendVisible="false" verticalGridLinesVisible="false" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.rowSpan="2">
+                <AreaChart fx:id="networkChart" createSymbols="false" horizontalGridLinesVisible="false" legendVisible="false" verticalGridLinesVisible="false" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.rowSpan="4">
 
-                    <xAxis><CategoryAxis /></xAxis>
-                    <yAxis><NumberAxis /></yAxis>
+                    <xAxis><NumberAxis minorTickVisible="false" side="BOTTOM" tickLabelsVisible="false" tickMarkVisible="false" /></xAxis>
+                    <yAxis><NumberAxis fx:id="yAxis" autoRanging="true" minorTickVisible="false" side="LEFT" tickLabelsVisible="false" tickMarkVisible="false" /></yAxis>
 
                 </AreaChart>
 
@@ -89,8 +90,8 @@
                 <Label text="Data received/sec:" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                 <Label fx:id="lblDataReceivedSec" text="0" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
 
-                <Label managed="false" text="Data sent/sec:" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-                <Label fx:id="lblDataSentSec" managed="false" text="0" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                <Label text="Data sent/sec:" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                <Label fx:id="lblDataSentSec" text="0" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
 
             </GridPane>
 

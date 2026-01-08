@@ -2,7 +2,6 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.chart.AreaChart?>
-<?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
@@ -17,7 +16,8 @@
 
 <AnchorPane prefHeight="650.0" prefWidth="1000.0"
             xmlns="http://javafx.com/javafx/25"
-            xmlns:fx="http://javafx.com/fxml/1">
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.plxg.activitymonitor.controller.DiskController">
 
     <children>
 
@@ -54,11 +54,12 @@
                     <ColumnConstraints percentWidth="33.33"/>
                 </columnConstraints>
 
-                <!-- 3 ROWS -->
+                <!-- 4 ROWS -->
                 <rowConstraints>
-                    <RowConstraints percentHeight="33.33"/>
-                    <RowConstraints percentHeight="33.33"/>
-                    <RowConstraints percentHeight="33.33"/>
+                    <RowConstraints percentHeight="25"/>
+                    <RowConstraints percentHeight="25"/>
+                    <RowConstraints percentHeight="25"/>
+                    <RowConstraints percentHeight="25"/>
                 </rowConstraints>
 
                 <padding>
@@ -75,8 +76,12 @@
                        GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.halignment="RIGHT"/>
 
                 <Label text="Reads in/sec:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                <Label fx:id="lblReadsInSec" text="0"
+                <Label fx:id="lblReadsInSec" text="0" textFill="#5AC8FA"
                        GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.halignment="RIGHT"/>
+
+                <Label text="Writes out/sec:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                <Label fx:id="lblWritesOutSec" text="0" textFill="#FF6B6B"
+                       GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.halignment="RIGHT"/>
 
 
                 <!-- CENTER PANEL (CHART) -->
@@ -93,14 +98,14 @@
                            verticalGridLinesVisible="false"
                            GridPane.columnIndex="1"
                            GridPane.rowIndex="1"
-                           GridPane.rowSpan="2">
+                           GridPane.rowSpan="3">
 
                     <xAxis>
-                        <CategoryAxis side="BOTTOM"/>
+                        <NumberAxis minorTickVisible="false" side="BOTTOM" tickLabelsVisible="false" tickMarkVisible="false" />
                     </xAxis>
 
                     <yAxis>
-                        <NumberAxis side="LEFT"/>
+                        <NumberAxis fx:id="yAxis" autoRanging="true" minorTickVisible="false" side="LEFT" tickLabelsVisible="false" tickMarkVisible="false" />
                     </yAxis>
 
                 </AreaChart>
@@ -119,12 +124,9 @@
                 <Label fx:id="lblDataReadSec" text="0"
                        GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.halignment="RIGHT"/>
 
-                <Label text="Data written/sec:"
-                       GridPane.columnIndex="2" GridPane.rowIndex="3"
-                       visible="false" managed="false"/>
+                <Label text="Data written/sec:" GridPane.columnIndex="2" GridPane.rowIndex="3"/>
                 <Label fx:id="lblDataWrittenSec" text="0"
-                       GridPane.columnIndex="2" GridPane.rowIndex="3"
-                       visible="false" managed="false"/>
+                       GridPane.columnIndex="2" GridPane.rowIndex="3" GridPane.halignment="RIGHT"/>
 
             </GridPane>
 

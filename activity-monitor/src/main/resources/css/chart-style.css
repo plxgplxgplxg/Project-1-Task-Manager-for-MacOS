@@ -1,5 +1,5 @@
 .default-color0.chart-series-area-fill {
-    -fx-fill: rgba(0, 191, 255, 0.3);
+    -fx-fill: rgba(0, 191, 255, 0.6);
 }
 
 .default-color0.chart-series-line {
@@ -8,10 +8,69 @@
 }
 
 .default-color1.chart-series-area-fill {
-    -fx-fill: rgba(255, 107, 107, 0.3);
+    -fx-fill: rgba(255, 107, 107, 0.6);
 }
 
 .default-color1.chart-series-line {
     -fx-stroke: #FF6B6B;
     -fx-stroke-width: 2px;
+}
+
+/* Network chart specific */
+.chart-series-area-fill.default-color0 {
+    -fx-fill: rgba(0, 191, 255, 0.7);
+}
+
+.chart-series-area-fill.default-color1 {
+    -fx-fill: rgba(255, 107, 107, 0.7);
+}
+
+/* Memory Pressure chart - mau xanh la giong Activity Monitor */
+.memory-pressure-chart .default-color0.chart-series-area-fill {
+    -fx-fill: rgba(76, 175, 80, 0.8);
+}
+
+.memory-pressure-chart .default-color0.chart-series-line {
+    -fx-stroke: #4CAF50;
+    -fx-stroke-width: 1.5px;
+}
+
+
+/* Disk IO chart - AreaChart */
+.disk-io-chart .default-color0.chart-series-area-fill {
+    -fx-fill: rgba(90, 200, 250, 0.5);
+}
+
+.disk-io-chart .default-color0.chart-series-line {
+    -fx-stroke: #5AC8FA;
+    -fx-stroke-width: 1.5px;
+}
+
+.disk-io-chart .default-color1.chart-series-area-fill {
+    -fx-fill: rgba(255, 107, 107, 0.5);
+}
+
+.disk-io-chart .default-color1.chart-series-line {
+    -fx-stroke: #FF6B6B;
+    -fx-stroke-width: 1.5px;
+}
+
+
+/* Network Packets chart - AreaChart */
+.network-packets-chart .default-color0.chart-series-area-fill {
+    -fx-fill: rgba(90, 200, 250, 0.5);
+}
+
+.network-packets-chart .default-color0.chart-series-line {
+    -fx-stroke: #5AC8FA;
+    -fx-stroke-width: 1.5px;
+}
+
+.network-packets-chart .default-color1.chart-series-area-fill {
+    -fx-fill: rgba(255, 107, 107, 0.5);
+}
+
+.network-packets-chart .default-color1.chart-series-line {
+    -fx-stroke: #FF6B6B;
+    -fx-stroke-width: 1.5px;
 }

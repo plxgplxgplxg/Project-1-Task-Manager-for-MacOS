@@ -60,6 +60,18 @@ public class MemoryService {
         );
     }
 
+    //tinh memory pressure dua tren % memory used
+    public double getMemoryPressure() {
+        long total = memory.getTotal();
+        long available = memory.getAvailable();
+        
+        //pressure = % memory dang su dung
+        double pressure = 100.0 * (total - available) / total;
+        
+        //gioi han 0-100
+        return Math.min(100, Math.max(0, pressure));
+    }
+
     //record chua ttin memory he thong
     public record MemoryStats (
         long totalMemory,

@@ -1,0 +1,24 @@
+# Kiro
+.kiro/
+
+# File đặc tả
+SYSTEM_ANALYSIS_DESIGN.md
+
+# IDE
+.idea/
+*.iml
+
+# Maven
+target/
+
+# Java
+*.class
+*.jar
+*.war
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

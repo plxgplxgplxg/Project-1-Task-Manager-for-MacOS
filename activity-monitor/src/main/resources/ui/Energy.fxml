@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="650.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" >
+<AnchorPane prefHeight="650.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.plxg.activitymonitor.controller.EnergyController" >
 
     <children>
         <VBox spacing="8" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
@@ -63,15 +63,12 @@
 
                 <!-- LineChart -->
                 <LineChart fx:id="energyImpactChart" createSymbols="false" horizontalGridLinesVisible="false" legendVisible="false" verticalGridLinesVisible="false" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.rowSpan="2">
-
                     <xAxis>
-                        <CategoryAxis side="BOTTOM" />
+                        <NumberAxis minorTickVisible="false" side="BOTTOM" tickLabelsVisible="false" tickMarkVisible="false" />
                     </xAxis>
-
                     <yAxis>
-                        <NumberAxis side="LEFT" />
+                        <NumberAxis autoRanging="false" upperBound="100" minorTickVisible="false" side="LEFT" tickLabelsVisible="false" tickMarkVisible="false" />
                     </yAxis>
-
                 </LineChart>
 
 
@@ -93,15 +90,12 @@
 
                 <!-- Battery AreaChart -->
                 <AreaChart fx:id="batteryChart" createSymbols="false" horizontalGridLinesVisible="false" legendVisible="false" verticalGridLinesVisible="false" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.rowSpan="2">
-
                     <xAxis>
-                        <CategoryAxis side="BOTTOM" />
+                        <NumberAxis minorTickVisible="false" side="BOTTOM" tickLabelsVisible="false" tickMarkVisible="false" />
                     </xAxis>
-
                     <yAxis>
-                        <NumberAxis fx:id="batteryAxis" side="LEFT" />
+                        <NumberAxis fx:id="batteryAxis" autoRanging="false" upperBound="100" minorTickVisible="false" side="LEFT" tickLabelsVisible="false" tickMarkVisible="false" />
                     </yAxis>
-
                 </AreaChart>
 
             </GridPane>
