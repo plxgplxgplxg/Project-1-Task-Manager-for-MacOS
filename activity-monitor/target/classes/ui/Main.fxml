@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
@@ -54,6 +56,28 @@
                         <Font name="System Bold Italic" size="14.0" />
                     </font>
                 </Label>
+                <Button fx:id="btnKillProcess" onAction="#onKillProcess" 
+                        styleClass="toolbar-icon-btn" 
+                        style="-fx-background-color: transparent; -fx-background-radius: 50; -fx-border-color: #888888; -fx-border-radius: 50; -fx-border-width: 1.5; -fx-min-width: 24; -fx-min-height: 24; -fx-max-width: 24; -fx-max-height: 24; -fx-padding: 0; -fx-cursor: hand;" 
+                        text="✕" textFill="#888888">
+                    <tooltip>
+                        <Tooltip text="Kết thúc tiến trình" />
+                    </tooltip>
+                    <font>
+                        <Font size="12.0" />
+                    </font>
+                </Button>
+                <Button fx:id="btnInspectProcess" onAction="#onInspectProcess" 
+                        styleClass="toolbar-icon-btn"
+                        style="-fx-background-color: transparent; -fx-background-radius: 50; -fx-border-color: #888888; -fx-border-radius: 50; -fx-border-width: 1.5; -fx-min-width: 24; -fx-min-height: 24; -fx-max-width: 24; -fx-max-height: 24; -fx-padding: 0; -fx-cursor: hand;" 
+                        text="i" textFill="#888888">
+                    <tooltip>
+                        <Tooltip text="Xem chi tiết tiến trình" />
+                    </tooltip>
+                    <font>
+                        <Font name="System Bold" size="14.0" />
+                    </font>
+                </Button>
                 <Region prefHeight="20.0" prefWidth="718.0" HBox.hgrow="ALWAYS" />
                 <TextField fx:id="txtSearch" prefWidth="150.0" promptText="Search">
                     <font>

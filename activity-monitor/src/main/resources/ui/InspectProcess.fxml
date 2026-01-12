@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="10" prefWidth="500" prefHeight="450" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.plxg.activitymonitor.controller.InspectProcessController">
+    <padding>
+        <Insets bottom="15" left="15" right="15" top="15"/>
+    </padding>
+
+    <GridPane hgap="10" vgap="8">
+        <columnConstraints>
+            <ColumnConstraints percentWidth="30"/>
+            <ColumnConstraints percentWidth="70"/>
+        </columnConstraints>
+
+        <Label text="Parent Process:" GridPane.rowIndex="0"/>
+        <Label fx:id="lblParentProcess" text="-" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+        <Label text="User:" GridPane.rowIndex="1"/>
+        <Label fx:id="lblUser" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+        <Label text="Process Group:" GridPane.rowIndex="2"/>
+        <Label fx:id="lblProcessGroup" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+        <Label text="CPU (%):" GridPane.rowIndex="3"/>
+        <Label fx:id="lblCpuPercent" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+        <Label text="Recent hangs:" GridPane.rowIndex="4"/>
+        <Label fx:id="lblRecentHangs" text="0" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+    </GridPane>
+
+    <Separator/>
+
+    <TabPane VBox.vgrow="ALWAYS">
+        <Tab text="Memory" closable="false">
+            <GridPane hgap="10" vgap="8">
+                <padding>
+                    <Insets bottom="10" left="10" right="10" top="10"/>
+                </padding>
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="50"/>
+                    <ColumnConstraints percentWidth="50"/>
+                </columnConstraints>
+
+                <Label text="Real Memory Size:" GridPane.rowIndex="0"/>
+                <Label fx:id="lblRealMemory" text="-" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                <Label text="Virtual Memory Size:" GridPane.rowIndex="1"/>
+                <Label fx:id="lblVirtualMemory" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                <Label text="Shared Memory Size:" GridPane.rowIndex="2"/>
+                <Label fx:id="lblSharedMemory" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                <Label text="Private Memory Size:" GridPane.rowIndex="3"/>
+                <Label fx:id="lblPrivateMemory" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+            </GridPane>
+        </Tab>
+
+        <Tab text="Statistics" closable="false">
+            <GridPane hgap="10" vgap="8">
+                <padding>
+                    <Insets bottom="10" left="10" right="10" top="10"/>
+                </padding>
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="50"/>
+                    <ColumnConstraints percentWidth="50"/>
+                </columnConstraints>
+
+                <Label text="CPU Time:" GridPane.rowIndex="0"/>
+                <Label fx:id="lblCpuTime" text="-" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                <Label text="Context Switches:" GridPane.rowIndex="1"/>
+                <Label fx:id="lblContextSwitches" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                <Label text="Threads:" GridPane.rowIndex="2"/>
+                <Label fx:id="lblThreads" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                <Label text="Ports:" GridPane.rowIndex="3"/>
+                <Label fx:id="lblPorts" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+            </GridPane>
+        </Tab>
+
+        <Tab text="Open Files and Ports" closable="false">
+            <TableView fx:id="openFilesTable" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="colFd" text="FD" prefWidth="60"/>
+                    <TableColumn fx:id="colType" text="Type" prefWidth="80"/>
+                    <TableColumn fx:id="colName" text="Name" prefWidth="300"/>
+                </columns>
+            </TableView>
+        </Tab>
+    </TabPane>
+
+    <Separator/>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Sample" disable="true"/>
+        <Button fx:id="btnQuit" text="Quit" onAction="#onQuitClicked"/>
+    </HBox>
+</VBox>

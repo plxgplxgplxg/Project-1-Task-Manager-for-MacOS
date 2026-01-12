@@ -13,11 +13,23 @@ import javafx.fxml.FXML;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.StackedAreaChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import oshi.software.os.OSProcess;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -269,70 +281,82 @@ public class CpuController {
                 new PropertyValueFactory<>("user")
         );
         cpuTable.setItems(processData);
-        setupContextMenu();
+        cpuTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     }
 
-    private void setupContextMenu() {
-        ContextMenu contextMenu = new ContextMenu();
-        MenuItem killItem = new MenuItem("Kết thúc tiến trình");
-        killItem.setOnAction(e -> killSelectedProcess());
-        contextMenu.getItems().add(killItem);
-        cpuTable.setContextMenu(contextMenu);
-    }
-
-    private void killSelectedProcess() {
-        CpuProcessInfo selected = cpuTable.getSelectionModel().getSelectedItem();
-        if (selected == null) {
+    public void killSelectedProcess() {
+        List<CpuProcessInfo> selectedItems = new ArrayList<>(cpuTable.getSelectionModel().getSelectedItems());
+        if (selectedItems.isEmpty()) {
             return;
         }
 
+        String message = selectedItems.size() == 1 
+            ? "Kết thúc tiến trình: " + selectedItems.get(0).getProcessName()
+            : "Kết thúc " + selectedItems.size() + " tiến trình đã chọn";
+
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Xác nhận");
-        confirm.setHeaderText("Kết thúc tiến trình: " + selected.getProcessName());
-        confirm.setContentText("Bạn có chắc muốn kết thúc tiến trình này? (PID: " + selected.getPid() + ")");
+        confirm.setHeaderText(message);
+        confirm.setContentText("Bạn có chắc muốn kết thúc?");
 
         Optional<ButtonType> result = confirm.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            ProcessKillService.KillResult killResult = killService.killProcess(selected.getPid());
-            showKillResult(killResult, selected.getProcessName());
+            int success = 0, failed = 0;
+            for (CpuProcessInfo item : selectedItems) {
+                ProcessKillService.KillResult killResult = killService.killProcess(item.getPid());
+                if (killResult == ProcessKillService.KillResult.SUCCESS) {
+                    success++;
+                } else {
+                    failed++;
+                }
+            }
+            showMultiKillResult(success, failed);
         }
     }
 
-    private void showKillResult(ProcessKillService.KillResult result, String processName) {
+    private void showMultiKillResult(int success, int failed) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Kết quả");
-
-        switch (result) {
-            case SUCCESS -> {
-                alert.setHeaderText("Thành công");
-                alert.setContentText("Đã kết thúc tiến trình: " + processName);
-            }
-            case ACCESS_DENIED -> {
-                alert.setAlertType(Alert.AlertType.ERROR);
-                alert.setHeaderText("Không có quyền");
-                alert.setContentText("Không thể kết thúc tiến trình hệ thống. Cần quyền Administrator.");
-            }
-            case NOT_FOUND -> {
-                alert.setAlertType(Alert.AlertType.WARNING);
-                alert.setHeaderText("Không tìm thấy");
-                alert.setContentText("Tiến trình không còn tồn tại.");
-            }
-            case FAILED -> {
-                alert.setAlertType(Alert.AlertType.ERROR);
-                alert.setHeaderText("Thất bại");
-                alert.setContentText("Không thể kết thúc tiến trình.");
-            }
+        alert.setHeaderText("Hoàn thành");
+        alert.setContentText("Thành công: " + success + ", Thất bại: " + failed);
+        if (failed > 0) {
+            alert.setAlertType(Alert.AlertType.WARNING);
         }
         alert.showAndWait();
     }
 
-    // milis sang hh:mm:ss
+    public void inspectSelectedProcess() {
+        CpuProcessInfo selected = cpuTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            return;
+        }
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/InspectProcess.fxml"));
+            Scene scene = new Scene(loader.load());
+            InspectProcessController controller = loader.getController();
+            controller.initData(selected.getPid(), selected.getProcessName(), selected.getCpuPercent());
+            Stage stage = new Stage();
+            stage.setTitle(selected.getProcessName() + " (" + selected.getPid() + ")");
+            stage.setScene(scene);
+            stage.initModality(Modality.NONE);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // milis sang mm:ss.cc (giong Activity Monitor)
     private String formatCpuTime(long millis) {
-        long sec = millis / 1000;
-        long h = sec / 3600;
-        long m = (sec % 3600) / 60;
-        long s = sec % 60;
-        return String.format("%d:%02d:%02d", h, m, s);
+        long totalSeconds = millis / 1000;
+        long hours = totalSeconds / 3600;
+        long minutes = (totalSeconds % 3600) / 60;
+        long seconds = totalSeconds % 60;
+        long centiseconds = (millis % 1000) / 10;
+        
+        if (hours > 0) {
+            return String.format("%d:%02d:%02d.%02d", hours, minutes, seconds, centiseconds);
+        }
+        return String.format("%02d:%02d.%02d", minutes, seconds, centiseconds);
     }
 
     public void setFilter(String filter) {

@@ -11,13 +11,25 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.chart.AreaChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -202,59 +214,66 @@ public class DiskController {
         );
 
         diskTable.setItems(processData);
-        setupContextMenu();
+        diskTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     }
 
-    private void setupContextMenu() {
-        ContextMenu contextMenu = new ContextMenu();
-        MenuItem killItem = new MenuItem("Kết thúc tiến trình");
-        killItem.setOnAction(e -> killSelectedProcess());
-        contextMenu.getItems().add(killItem);
-        diskTable.setContextMenu(contextMenu);
-    }
-
-    private void killSelectedProcess() {
+    public void inspectSelectedProcess() {
         DiskProcessInfo selected = diskTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
             return;
         }
-
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("Xác nhận");
-        confirm.setHeaderText("Kết thúc tiến trình: " + selected.getProcessName());
-        confirm.setContentText("Bạn có chắc muốn kết thúc tiến trình này? (PID: " + selected.getPid() + ")");
-
-        Optional<ButtonType> result = confirm.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            ProcessKillService.KillResult killResult = killService.killProcess(selected.getPid());
-            showKillResult(killResult, selected.getProcessName());
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/InspectProcess.fxml"));
+            Scene scene = new Scene(loader.load());
+            InspectProcessController controller = loader.getController();
+            controller.initData(selected.getPid(), selected.getProcessName(), 0);
+            Stage stage = new Stage();
+            stage.setTitle(selected.getProcessName() + " (" + selected.getPid() + ")");
+            stage.setScene(scene);
+            stage.initModality(Modality.NONE);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    private void showKillResult(ProcessKillService.KillResult result, String processName) {
+    public void killSelectedProcess() {
+        List<DiskProcessInfo> selectedItems = new ArrayList<>(diskTable.getSelectionModel().getSelectedItems());
+        if (selectedItems.isEmpty()) {
+            return;
+        }
+
+        String message = selectedItems.size() == 1 
+            ? "Kết thúc tiến trình: " + selectedItems.get(0).getProcessName()
+            : "Kết thúc " + selectedItems.size() + " tiến trình đã chọn";
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Xác nhận");
+        confirm.setHeaderText(message);
+        confirm.setContentText("Bạn có chắc muốn kết thúc?");
+
+        Optional<ButtonType> result = confirm.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            int success = 0, failed = 0;
+            for (DiskProcessInfo item : selectedItems) {
+                ProcessKillService.KillResult killResult = killService.killProcess(item.getPid());
+                if (killResult == ProcessKillService.KillResult.SUCCESS) {
+                    success++;
+                } else {
+                    failed++;
+                }
+            }
+            showMultiKillResult(success, failed);
+        }
+    }
+
+    private void showMultiKillResult(int success, int failed) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Kết quả");
-
-        switch (result) {
-            case SUCCESS -> {
-                alert.setHeaderText("Thành công");
-                alert.setContentText("Đã kết thúc tiến trình: " + processName);
-            }
-            case ACCESS_DENIED -> {
-                alert.setAlertType(Alert.AlertType.ERROR);
-                alert.setHeaderText("Không có quyền");
-                alert.setContentText("Không thể kết thúc tiến trình hệ thống. Cần quyền Administrator.");
-            }
-            case NOT_FOUND -> {
-                alert.setAlertType(Alert.AlertType.WARNING);
-                alert.setHeaderText("Không tìm thấy");
-                alert.setContentText("Tiến trình không còn tồn tại.");
-            }
-            case FAILED -> {
-                alert.setAlertType(Alert.AlertType.ERROR);
-                alert.setHeaderText("Thất bại");
-                alert.setContentText("Không thể kết thúc tiến trình.");
-            }
+        alert.setHeaderText("Hoàn thành");
+        alert.setContentText("Thành công: " + success + ", Thất bại: " + failed);
+        if (failed > 0) {
+            alert.setAlertType(Alert.AlertType.WARNING);
         }
         alert.showAndWait();
     }
